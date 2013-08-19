@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- DB Modified configuration file-->
+<DBCompare>
+	<DatabaseConfig>
+		<ServerName>ServerName</ServerName>
+		<DatabaseName>DatabaseName</DatabaseName>
+	</DatabaseConfig>
+	<Procedures>
+		<Procedure>
+		  <ProcedureName>Datamart_GetAllTypes</ProcedureName>
+		  <DisplayName>Get All Types</DisplayName>
+		</Procedure>
+		<Procedure>
+		  <ProcedureName>Datamart_GetTransactionList</ProcedureName>
+		  <DisplayName>Get Transaction List</DisplayName>
+		</Procedure>
+	</Procedures>
+	<Parameters>
+		<Parameter>
+		  <ParameterName>@StartDate</ParameterName>
+		  <ParameterText>Start Date</ParameterText>
+		</Parameter>
+		<Parameter>
+		  <ParameterName>@EndDate</ParameterName>
+		  <ParameterText>End Date</ParameterText>
+		</Parameter>
+	</Parameters>
+</DBCompare>

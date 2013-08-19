@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="QueryParameterDataSet" targetNamespace="http://tempuri.org/QueryParameters.xsd" xmlns:mstns="http://tempuri.org/QueryParameters.xsd" xmlns="http://tempuri.org/QueryParameters.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="QueryParameterDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="QueryParameterDataSet" msprop:Generator_UserDSName="QueryParameterDataSet">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="QueryParameterDataTable" msprop:Generator_TableClassName="QueryParameterDataTableDataTable" msprop:Generator_TableVarName="tableQueryParameterDataTable" msprop:Generator_RowChangedName="QueryParameterDataTableRowChanged" msprop:Generator_TablePropName="QueryParameterDataTable" msprop:Generator_RowDeletingName="QueryParameterDataTableRowDeleting" msprop:Generator_RowChangingName="QueryParameterDataTableRowChanging" msprop:Generator_RowEvHandlerName="QueryParameterDataTableRowChangeEventHandler" msprop:Generator_RowDeletedName="QueryParameterDataTableRowDeleted" msprop:Generator_RowClassName="QueryParameterDataTableRow" msprop:Generator_UserTableName="QueryParameterDataTable" msprop:Generator_RowEvArgName="QueryParameterDataTableRowChangeEvent">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ParameterName" msprop:Generator_ColumnVarNameInTable="columnParameterName" msprop:Generator_ColumnPropNameInRow="ParameterName" msprop:Generator_ColumnPropNameInTable="ParameterNameColumn" msprop:Generator_UserColumnName="ParameterName" type="xs:string" minOccurs="0" />
+              <xs:element name="ParameterDisplayName" msprop:Generator_ColumnVarNameInTable="columnParameterDisplayName" msprop:Generator_ColumnPropNameInRow="ParameterDisplayName" msprop:Generator_ColumnPropNameInTable="ParameterDisplayNameColumn" msprop:Generator_UserColumnName="ParameterDisplayName" type="xs:string" minOccurs="0" />
+              <xs:element name="DataType" msprop:Generator_ColumnVarNameInTable="columnDataType" msprop:Generator_ColumnPropNameInRow="DataType" msprop:Generator_ColumnPropNameInTable="DataTypeColumn" msprop:Generator_UserColumnName="DataType" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
