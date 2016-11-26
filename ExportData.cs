@@ -7,15 +7,23 @@ using System.IO;
 
 namespace DataViewer
 {
+
 	public class ExportData
 	{
-		public static void ExportResults(
+        enum FileFormat
+        {
+            Excel = 1,
+            XML = 2,
+            CSV = 3
+        }
+
+        public static void ExportResults(
 			string queryName,
 			DataTable results
 		)
 		{
 			SaveFileDialog saveFileDialog = new SaveFileDialog();
-			saveFileDialog.Filter = "Excel WorkBook (*.xls)|.xls|Extensible Markup Language (*.xml)|.xml|CSV (*.csv)|.csv";
+			saveFileDialog.Filter = "Excel WorkBook (*.xlsx)|.xlsx|Extensible Markup Language (*.xml)|.xml|CSV (*.csv)|.csv";
 			saveFileDialog.FileName = queryName;
 			DialogResult dialogResult = saveFileDialog.ShowDialog();
 			if (dialogResult == DialogResult.Cancel)
@@ -27,13 +35,13 @@ namespace DataViewer
 			// Filter index should match the order of the file types in the Filter
 			switch (saveFileDialog.FilterIndex)
 			{
-				case 1: // Excel
+				case (int)FileFormat.Excel: 
 					SaveResultsToExcel(saveFileDialog.FileName, results);
 					break;
-				case 2: // XML
+				case (int)FileFormat.XML: 
 					SaveResultsToXml(saveFileDialog.FileName, results);
 					break;
-                case 3: // CSV
+                case (int)FileFormat.CSV: 
                     SaveResultsToCsv(saveFileDialog.FileName, results);
                     break;
                 default:
@@ -56,7 +64,7 @@ namespace DataViewer
 		{
 			var wb = new XLWorkbook();
 			wb.Worksheets.Add(results);
-			wb.SaveAs(fileName);
+            wb.SaveAs(fileName);
 		}
 
         private static void SaveResultsToCsv(
