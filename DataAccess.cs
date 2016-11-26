@@ -44,23 +44,38 @@ namespace DataViewer
 			return connectionString;
 		}
 
-		// Use the provided SQL to fill and return a data set
 		public static DataSet FillDataSet(
-			string sql,
-			string connectionString
+            string storedProcName,
+            List<StoredProcParameter> parameterList,
+            string connectionString
 		)
 		{
 			DataSet returnDataset = new DataSet();
 			using (SqlConnection connection = new SqlConnection(connectionString))
 			{
 				connection.Open();
-				using (SqlCommand command = new SqlCommand(sql, connection))
+				using (SqlCommand command = new SqlCommand(storedProcName, connection))
 				{
-					SqlDataAdapter dataAdapter = new SqlDataAdapter(command);
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    SqlDataAdapter dataAdapter = new SqlDataAdapter(SetStoredProcParameters(command, parameterList));
 					dataAdapter.Fill(returnDataset);
 				}
 			}
 			return returnDataset;
 		}
+
+        private static SqlCommand SetStoredProcParameters(
+            SqlCommand command,
+            List<StoredProcParameter> parameterList
+        )
+        {
+            foreach(var item in parameterList)
+            {
+                command.Parameters.Add(item.ParameterName, item.ParameterDataType).Value = item.ParameterValue;
+            }
+            return command;
+        }
+        
 	}
 }

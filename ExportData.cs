@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using System.Data;
 using ClosedXML.Excel;
+using System.Text;
+using System.IO;
 
 namespace DataViewer
 {
@@ -16,7 +15,7 @@ namespace DataViewer
 		)
 		{
 			SaveFileDialog saveFileDialog = new SaveFileDialog();
-			saveFileDialog.Filter = "Excel WorkBook (*.xls)|.xls|Extensible Markup Language (*.xml)|.xml";
+			saveFileDialog.Filter = "Excel WorkBook (*.xls)|.xls|Extensible Markup Language (*.xml)|.xml|CSV (*.csv)|.csv";
 			saveFileDialog.FileName = queryName;
 			DialogResult dialogResult = saveFileDialog.ShowDialog();
 			if (dialogResult == DialogResult.Cancel)
@@ -34,7 +33,10 @@ namespace DataViewer
 				case 2: // XML
 					SaveResultsToXml(saveFileDialog.FileName, results);
 					break;
-				default:
+                case 3: // CSV
+                    SaveResultsToCsv(saveFileDialog.FileName, results);
+                    break;
+                default:
 					throw new ApplicationException("Unhandled ExportData type");
 			}
 		}
@@ -56,5 +58,44 @@ namespace DataViewer
 			wb.Worksheets.Add(results);
 			wb.SaveAs(fileName);
 		}
-	}
+
+        private static void SaveResultsToCsv(
+            string fileName,
+            DataTable results
+        )
+        {
+            var sb = new StringBuilder();
+            bool firstColumn = true;
+            foreach (var column in results.Columns)
+            {
+                if (!firstColumn)
+                {
+                    sb.Append(",");
+                } else
+                {
+                    firstColumn = false;
+                }
+                sb.Append("\"" + column.ToString() + "\"");
+            }
+            sb.AppendLine();
+            foreach (DataRow row in results.Rows)
+            {
+                firstColumn = true;
+                foreach (var item in row.ItemArray)
+                {
+                    if (!firstColumn)
+                    {
+                        sb.Append(",");
+                    }
+                    else
+                    {
+                        firstColumn = false;
+                    }
+                    sb.Append("\"" + item.ToString() + "\"");
+                }
+                sb.AppendLine();
+            }
+            File.WriteAllText(fileName, sb.ToString());
+        }
+    }
 }

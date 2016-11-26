@@ -2,27 +2,44 @@
 <!-- DB Modified configuration file-->
 <DBCompare>
 	<DatabaseConfig>
-		<ServerName>ServerName</ServerName>
-		<DatabaseName>DatabaseName</DatabaseName>
+		<ServerName>RobLT</ServerName>
+		<DatabaseName>TestDb</DatabaseName>
 	</DatabaseConfig>
 	<Procedures>
 		<Procedure>
-		  <ProcedureName>Datamart_GetAllTypes</ProcedureName>
-		  <DisplayName>Get All Types</DisplayName>
+      <ProcedureSchemaName>test</ProcedureSchemaName>
+		  <ProcedureName>GetSqlToolTest</ProcedureName>
+		  <DisplayName>Get Sql Tool Test</DisplayName>
 		</Procedure>
-		<Procedure>
-		  <ProcedureName>Datamart_GetTransactionList</ProcedureName>
-		  <DisplayName>Get Transaction List</DisplayName>
-		</Procedure>
+    <Procedure>
+      <ProcedureSchemaName>test</ProcedureSchemaName>
+      <ProcedureName>GetStateProvinceForCountry</ProcedureName>
+      <DisplayName>Get State-Province For Country</DisplayName>
+    </Procedure>
+    <Procedure>
+      <ProcedureSchemaName>test</ProcedureSchemaName>
+      <ProcedureName>GetStates</ProcedureName>
+      <DisplayName>Get States</DisplayName>
+    </Procedure>
+    <Procedure>
+      <ProcedureSchemaName>dbo</ProcedureSchemaName>
+      <ProcedureName>GetCustomer</ProcedureName>
+      <DisplayName>Get Customers</DisplayName>
+    </Procedure>
+    <Procedure>
+      <ProcedureSchemaName>dbo</ProcedureSchemaName>
+      <ProcedureName>GetCustomerByDate</ProcedureName>
+      <DisplayName>Get Customer By Date</DisplayName>
+    </Procedure>
 	</Procedures>
 	<Parameters>
 		<Parameter>
-		  <ParameterName>@StartDate</ParameterName>
-		  <ParameterText>Start Date</ParameterText>
+		  <ParameterName>@RecordId</ParameterName>
+		  <ParameterText>Record ID</ParameterText>
 		</Parameter>
-		<Parameter>
-		  <ParameterName>@EndDate</ParameterName>
-		  <ParameterText>End Date</ParameterText>
-		</Parameter>
-	</Parameters>
+    <Parameter>
+      <ParameterName>@CountryCode</ParameterName>
+      <ParameterText>Country Code</ParameterText>
+    </Parameter>
+   </Parameters>
 </DBCompare>

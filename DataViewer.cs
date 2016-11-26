@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace DataViewer
 {
-	public partial class DataViewer : Form
+    public partial class DataViewer : Form
 	{
 		string connectionString;
         string serverName;
@@ -24,7 +20,21 @@ namespace DataViewer
             InitializeForm();
 		}
 
-		private void InitializeForm()
+        private void ReadConfigurationData()
+        {
+            string configFileName = "DataViewer_Config.xml";
+            DataSet configData = new DataSet();
+            configData.ReadXml(configFileName);
+            DataRow dataRow = configData.Tables[0].Rows[0];
+            serverName = Convert.ToString(dataRow["ServerName"]);
+            databaseName = Convert.ToString(dataRow["DatabaseName"]);
+            connectionString = DataAccess.GetConnectionString(serverName, databaseName);
+
+            queryList = configData.Tables["Procedure"];
+            parameterDisplayNames = SetParameterList(configData.Tables["Parameter"]);
+        }
+
+        private void InitializeForm()
 		{
 			GetQueryList();
 			cboProcs.ValueMemberChanged += new EventHandler(cboProcs_SelectedIndexChanged);
@@ -34,62 +44,56 @@ namespace DataViewer
 
 		private void GetQueryList()
 		{
-			cboProcs.DisplayMember = "DisplayName";
-            cboProcs.ValueMember = "ProcedureName";
-            cboProcs.DataSource = queryList;
+            var procList = new List<StoredProcInfo>();
+            foreach(DataRow row in queryList.Rows)
+            {
+                procList.Add(new StoredProcInfo(row["ProcedureSchemaName"].ToString(), row["ProcedureName"].ToString(), row["DisplayName"].ToString()));
+            }
+            cboProcs.DataSource = procList;
 		}
 
 		private void GetParameters()
 		{
-			gridParameters.Columns.Clear();
-			string procedureName = cboProcs.SelectedValue.ToString();
-            QueryParameter queryParameter = new QueryParameter(parameterDisplayNames);
+            gridParameters.Rows.Clear();
+            var selectedProc = (StoredProcInfo)cboProcs.SelectedValue;
+            Dictionary<string, SqlDbType> parameterList = SQLSchema.GetStoredProcedureParameters(serverName, databaseName,
+                selectedProc.SchemaName, selectedProc.ProcName);
+            foreach(var item in parameterList)
+            {
+                string parameterName = item.Key;
+                string parameterDisplayName = "";
+                SqlDbType parameterDataType = item.Value;
+                string parameterValue = "";
+                if (!parameterDisplayNames.TryGetValue(parameterName, out parameterDisplayName))
+                {
+                    parameterDisplayName = parameterName;
+                }
+                gridParameters.Rows.Add(parameterDisplayName, parameterName, parameterDataType, parameterValue);
+            }
+            SetParameterDataTypes();
+        }
 
-			BindingSource bindingSource = new BindingSource();
-			bindingSource.DataSource = queryParameter.GetQueryParameterDataSet(serverName, databaseName, procedureName);
-			gridParameters.DataSource = bindingSource;
-
-            // Hide the Parameter Name column
-            gridParameters.Columns[0].Visible = false;
-
-			gridParameters.Columns[1].Visible = true;
-			gridParameters.Columns[1].HeaderText = "Parameter";
-			gridParameters.Columns[1].Width = 150;
-			gridParameters.Columns[1].ReadOnly = true;
-
-            // Hide the Data Type column
-			gridParameters.Columns[2].Visible = false;
-
-			// Add a column for the user to enter the parameter value
-			DataGridViewColumn column = new DataGridViewTextBoxColumn();
-			column.HeaderText = "Input Value";
-			gridParameters.Columns.Add(column);
-			SetParameterDataTypes();
-		}
-
-		private string GetParameterValues()
+        private List<StoredProcParameter> GetParameterValues()
 		{
-			string returnValues = "";
-			foreach (DataGridViewRow item in gridParameters.Rows)
+            var returnList = new List<StoredProcParameter>();
+
+            foreach (DataGridViewRow item in gridParameters.Rows)
 			{
 				if (!item.IsNewRow)
 				{
-					if (returnValues.Length > 0)
-					{
-						returnValues += ", ";
-					}
-					string value = item.Cells[3].Value.ToString();
-
-					returnValues += "'" + value + "'";
+                    string value = item.Cells[3].Value.ToString();
+                    string name = item.Cells[1].Value.ToString();
+                    SqlDbType dataType = (SqlDbType)item.Cells[2].Value;
+                    var parameter = new StoredProcParameter(name, dataType, value);
+                    returnList.Add(parameter);
 				}
 			}
-			return returnValues;
+			return returnList;
 		}
-
-        // After a new procedure has been chosen, clear the results and the parameters
+        
         private void ClearForm()
         {
-            gridParameters.DataSource = null;
+            gridParameters.Rows.Clear();
             gridResults.DataSource = null;
         }
 
@@ -100,20 +104,6 @@ namespace DataViewer
 
 			ExportData.ExportResults(queryName, results);
 		}
-
-        private void ReadConfigurationData()
-        {
-            string configFileName = "DataViewer_Config.xml";
-            DataSet configData = new DataSet();
-            configData.ReadXml(configFileName);
-            DataRow dataRow = configData.Tables[0].Rows[0];
-            serverName = Convert.ToString(dataRow["ServerName"]);
-            databaseName = Convert.ToString(dataRow["DatabaseName"]);
-			connectionString = DataAccess.GetConnectionString(serverName, databaseName);
-
-            queryList = configData.Tables["Procedure"];
-            parameterDisplayNames = SetParameterList(configData.Tables["Parameter"]);
-        }
 
         private Dictionary<string, string> SetParameterList(
             DataTable parameterDataTable
@@ -128,42 +118,30 @@ namespace DataViewer
             }
             return parameterListLocal;
         }
-
-		private void SetParameterDataTypes()
-		{
-			foreach (DataGridViewRow item in gridParameters.Rows)
-			{
-				if (!item.IsNewRow)
-				{
-					string dataValue = item.Cells[2].Value.ToString();
-					item.Cells[3].ValueType = GetColumnDataType(dataValue);
-				}
-			}
-		}
-
-		private Type GetColumnDataType(
-			string dataTypeName
-		)
-		{
-			switch (dataTypeName.ToLower())
-			{
-				case "datetime":
-					return typeof(DateTime);
-				default:
-					return typeof(String);
-			}
-		}
-
+        
 		#region EventHandlers
 
 		private void buttonGo_Click(object sender, EventArgs e)
 		{
-			GoButtonClick();
+            try
+            {
+                GoButtonClick();
+            } catch (Exception ex)
+            {
+                ErrorHandler(ex);
+            }
 		}
 
 		private void buttonExport_Click(object sender, EventArgs e)
 		{
-			ExportResults();
+            try
+            {
+                ExportResults(); 
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler(ex);
+            }
 		}
 
 		private void cboProcs_SelectedIndexChanged(object sender, EventArgs e)
@@ -174,10 +152,10 @@ namespace DataViewer
 
 		private void GoButtonClick()
 		{
-			string procedureName = cboProcs.SelectedValue.ToString();
-			string parameterValues = GetParameterValues();
-			string sql = "EXEC " + procedureName + " " + parameterValues + ";";
-			DataSet queryValue = DataAccess.FillDataSet(sql, connectionString);
+            var selectedProc = (StoredProcInfo)cboProcs.SelectedValue;
+            var storedProcName = selectedProc.SchemaName + "." + selectedProc.ProcName;
+            var parameterValues = GetParameterValues();
+			DataSet queryValue = DataAccess.FillDataSet(storedProcName, parameterValues, connectionString);
 
 			BindingSource bindingSource = new BindingSource();
 			bindingSource.DataSource = queryValue.Tables[0];
@@ -193,7 +171,48 @@ namespace DataViewer
 				e.Exception.Message;
 			MessageBox.Show(errorMessage);
 		}
+        #endregion
 
-		#endregion
-	}
+        private void ErrorHandler(
+            Exception e
+        )
+        {
+            var errorMessage = e.Message;
+            var caption = "Error";
+            MessageBox.Show(errorMessage, caption);
+        }
+        
+        private void SetParameterDataTypes()
+        {
+            foreach (DataGridViewRow item in gridParameters.Rows)
+            {
+                if (!item.IsNewRow)
+                {
+                    SqlDbType dataType = (SqlDbType)item.Cells[2].Value;
+                    item.Cells[3].ValueType = GetColumnDataType(dataType);
+                }
+            }
+        }
+
+        private Type GetColumnDataType(
+            SqlDbType dataType
+        )
+        {
+            switch (dataType)
+            {
+                case SqlDbType.Date:
+                case SqlDbType.DateTime:
+                case SqlDbType.DateTime2:
+                    return typeof(DateTime);
+                case SqlDbType.BigInt:
+                case SqlDbType.Int:
+                case SqlDbType.SmallInt:
+                case SqlDbType.TinyInt:
+                    return typeof(Int32);
+                default:
+                    return typeof(String);
+            }
+        }
+
+    }
 }

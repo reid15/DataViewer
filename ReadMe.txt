@@ -1,9 +1,9 @@
 DataViewer:
-DataViewer is a program to allow an end user to execute stored procedure to view results in a grid, and to save those results to a spreadsheet.
+DataViewer is a program to allow an end user to execute stored procedure to view results in a grid, and to save those results to a spreadsheet, XML document or a CSV file.
 
 References:
 The solution references a OpenXML component to save the query results to an Excel spreadsheet.
-http://closedxml.codeplex.com/
+https://github.com/ClosedXML/ClosedXML
 
 Configuration:
 Update the DataViewer_Config.xml file with configuration data.
