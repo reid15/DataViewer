@@ -1,7 +1,8 @@
-﻿using System;
+﻿using ClosedXML.Excel;
+using Newtonsoft.Json;
+using System;
 using System.Windows.Forms;
 using System.Data;
-using ClosedXML.Excel;
 using System.Text;
 using System.IO;
 
@@ -14,7 +15,8 @@ namespace DataViewer
         {
             Excel = 1,
             XML = 2,
-            CSV = 3
+            CSV = 3,
+            JSON = 4
         }
 
         public static void ExportResults(
@@ -23,7 +25,7 @@ namespace DataViewer
 		)
 		{
 			SaveFileDialog saveFileDialog = new SaveFileDialog();
-			saveFileDialog.Filter = "Excel WorkBook (*.xlsx)|.xlsx|Extensible Markup Language (*.xml)|.xml|CSV (*.csv)|.csv";
+			saveFileDialog.Filter = "Excel WorkBook (*.xlsx)|.xlsx|Extensible Markup Language (*.xml)|.xml|CSV (*.csv)|.csv|JSON (*.json)|.json";
 			saveFileDialog.FileName = queryName;
 			DialogResult dialogResult = saveFileDialog.ShowDialog();
 			if (dialogResult == DialogResult.Cancel)
@@ -44,6 +46,10 @@ namespace DataViewer
                 case (int)FileFormat.CSV: 
                     SaveResultsToCsv(saveFileDialog.FileName, results);
                     break;
+                case (int)FileFormat.JSON:
+                    SaveResultsToJson(saveFileDialog.FileName, results);
+                    break;
+
                 default:
 					throw new ApplicationException("Unhandled ExportData type");
 			}
@@ -55,7 +61,7 @@ namespace DataViewer
 		)
 		{
 			results.WriteXml(fileName);
-		}
+        }
 
 		private static void SaveResultsToExcel(
 			string fileName,
@@ -104,6 +110,15 @@ namespace DataViewer
                 sb.AppendLine();
             }
             File.WriteAllText(fileName, sb.ToString());
+        }
+
+        private static void SaveResultsToJson(
+            string fileName,
+            DataTable results
+        )
+        {
+            string json = JsonConvert.SerializeObject(results);
+            File.WriteAllText(fileName, json);
         }
     }
 }

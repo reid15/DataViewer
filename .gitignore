@@ -213,3 +213,5 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+*.lock
+.vs/DataViewer/v15/Server/sqlite3/storage.ide

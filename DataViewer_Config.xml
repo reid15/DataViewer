@@ -2,44 +2,25 @@
 <!-- DB Modified configuration file-->
 <DBCompare>
 	<DatabaseConfig>
-		<ServerName>RobLT</ServerName>
+		<ServerName>RobLT\SS2017</ServerName>
 		<DatabaseName>TestDb</DatabaseName>
 	</DatabaseConfig>
 	<Procedures>
 		<Procedure>
-      <ProcedureSchemaName>test</ProcedureSchemaName>
-		  <ProcedureName>GetSqlToolTest</ProcedureName>
-		  <DisplayName>Get Sql Tool Test</DisplayName>
+      <ProcedureSchemaName>dbo</ProcedureSchemaName>
+		  <ProcedureName>GetSalesForCustomer</ProcedureName>
+		  <DisplayName>Get Sales For Customer</DisplayName>
 		</Procedure>
-    <Procedure>
-      <ProcedureSchemaName>test</ProcedureSchemaName>
-      <ProcedureName>GetStateProvinceForCountry</ProcedureName>
-      <DisplayName>Get State-Province For Country</DisplayName>
-    </Procedure>
-    <Procedure>
-      <ProcedureSchemaName>test</ProcedureSchemaName>
-      <ProcedureName>GetStates</ProcedureName>
-      <DisplayName>Get States</DisplayName>
-    </Procedure>
     <Procedure>
       <ProcedureSchemaName>dbo</ProcedureSchemaName>
       <ProcedureName>GetCustomer</ProcedureName>
-      <DisplayName>Get Customers</DisplayName>
-    </Procedure>
-    <Procedure>
-      <ProcedureSchemaName>dbo</ProcedureSchemaName>
-      <ProcedureName>GetCustomerByDate</ProcedureName>
-      <DisplayName>Get Customer By Date</DisplayName>
+      <DisplayName>Get Customer</DisplayName>
     </Procedure>
 	</Procedures>
 	<Parameters>
 		<Parameter>
-		  <ParameterName>@RecordId</ParameterName>
-		  <ParameterText>Record ID</ParameterText>
+		  <ParameterName>@CustomerId</ParameterName>
+		  <ParameterText>Customer ID</ParameterText>
 		</Parameter>
-    <Parameter>
-      <ParameterName>@CountryCode</ParameterName>
-      <ParameterText>Country Code</ParameterText>
-    </Parameter>
    </Parameters>
 </DBCompare>
