@@ -215,3 +215,5 @@ pip-log.txt
 .mr.developer.cfg
 *.lock
 .vs/DataViewer/v15/Server/sqlite3/storage.ide
+*.ide-shm
+.vs/DataViewer/v15/Server/sqlite3/storage.ide-wal
