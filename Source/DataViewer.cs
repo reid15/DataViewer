@@ -28,7 +28,7 @@ namespace DataViewer
             DataRow dataRow = configData.Tables[0].Rows[0];
             serverName = Convert.ToString(dataRow["ServerName"]);
             databaseName = Convert.ToString(dataRow["DatabaseName"]);
-            connectionString = DataAccess.GetConnectionString(serverName, databaseName);
+            connectionString = DatabaseCommon.DataAccess.GetConnectionString(serverName, databaseName);
 
             queryList = configData.Tables["Procedure"];
             parameterDisplayNames = SetParameterList(configData.Tables["Parameter"]);

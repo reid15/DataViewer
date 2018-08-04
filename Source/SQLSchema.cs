@@ -7,15 +7,6 @@ namespace DataViewer
 {
     public class SQLSchema
 	{
-		// Return Database SMO object for an existing database.
-		private static Database GetDatabase(
-			string serverName,
-			string databaseName
-		)
-		{
-			Server server = new Server(serverName);
-			return server.Databases[databaseName];
-		}
 
 		private static StoredProcedure GetStoredProcedure(
 			string serverName,
@@ -24,7 +15,7 @@ namespace DataViewer
             string storedProcedureName
 		)
 		{
-			Database database = GetDatabase(serverName, databaseName);
+			Database database = DatabaseCommon.DatabaseSchema.GetDatabase(serverName, databaseName);
 			return database.StoredProcedures[storedProcedureName, storedProcedureSchemaName];
 		}
 
