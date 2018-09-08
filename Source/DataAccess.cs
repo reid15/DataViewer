@@ -12,7 +12,7 @@ namespace DataViewer
 
 		public static DataSet FillDataSet(
             string storedProcName,
-            List<StoredProcParameter> parameterList,
+            List<StoredProcParameterValue> parameterList,
             string connectionString
 		)
 		{
@@ -33,7 +33,7 @@ namespace DataViewer
 
         private static SqlCommand SetStoredProcParameters(
             SqlCommand command,
-            List<StoredProcParameter> parameterList
+            List<StoredProcParameterValue> parameterList
         )
         {
             foreach(var item in parameterList)

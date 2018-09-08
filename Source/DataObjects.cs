@@ -12,16 +12,19 @@ namespace DataViewer
         public string SchemaName { get; set; }
         public string ProcName { get; set; }
         public string DisplayName { get; set; }
+        public List<StoredProcParameter> StoredProcParameters { get; set; }
 
         public StoredProcInfo(
             string schemaName,
             string procName,
-            string displayName
+            string displayName,
+            List<StoredProcParameter> storedProcParameters
         )
         {
             SchemaName = schemaName;
             ProcName = procName;
             DisplayName = displayName;
+            StoredProcParameters = storedProcParameters;
         }
         public override string ToString()
         {
@@ -34,8 +37,29 @@ namespace DataViewer
         public string ParameterName { get; set; }
         public SqlDbType ParameterDataType { get; set; }
         public string ParameterValue { get; set; }
+        public string ParameterDisplayName { get; set; }
 
         public StoredProcParameter(
+            string parameterName,
+            SqlDbType parameterDataType,
+            string parameterValue,
+            string parameterDisplayName
+        )
+        {
+            ParameterName = parameterName;
+            ParameterDataType = parameterDataType;
+            ParameterValue = parameterValue;
+            ParameterDisplayName = parameterDisplayName;
+        }
+    }
+
+    public class StoredProcParameterValue
+    {
+        public string ParameterName { get; set; }
+        public SqlDbType ParameterDataType { get; set; }
+        public string ParameterValue { get; set; }
+
+        public StoredProcParameterValue(
             string parameterName,
             SqlDbType parameterDataType,
             string parameterValue
@@ -46,5 +70,5 @@ namespace DataViewer
             ParameterValue = parameterValue;
         }
     }
-  
+
 }

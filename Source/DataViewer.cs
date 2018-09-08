@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Windows.Forms;
 
@@ -10,72 +11,70 @@ namespace DataViewer
 		string connectionString;
         string serverName;
         string databaseName;
-        DataTable queryList;
-        Dictionary<string, string> parameterDisplayNames;
+        bool formatObjectName = false;
 
 		public DataViewer()
 		{
-			InitializeComponent();
-            ReadConfigurationData();
-            InitializeForm();
+            try
+            {
+                InitializeComponent();
+                ReadConfigurationData();
+                InitializeForm();
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler(ex);
+                this.Close();
+            }
 		}
 
         private void ReadConfigurationData()
         {
-            string configFileName = "DataViewer_Config.xml";
-            DataSet configData = new DataSet();
-            configData.ReadXml(configFileName);
-            DataRow dataRow = configData.Tables[0].Rows[0];
-            serverName = Convert.ToString(dataRow["ServerName"]);
-            databaseName = Convert.ToString(dataRow["DatabaseName"]);
-            connectionString = DatabaseCommon.DataAccess.GetConnectionString(serverName, databaseName);
+            var settingsReader = new AppSettingsReader();
 
-            queryList = configData.Tables["Procedure"];
-            parameterDisplayNames = SetParameterList(configData.Tables["Parameter"]);
+            serverName = (string)settingsReader.GetValue("DatabaseInstanceName", typeof(string));
+            databaseName = (string)settingsReader.GetValue("DatabaseName", typeof(string));
+            string formatObjectNameString = (string)settingsReader.GetValue("FormatObjectName", typeof(string));
+            if (formatObjectNameString.ToLower() == "true")
+            {
+                formatObjectName = true;
+            }
+            connectionString = DatabaseCommon.DataAccess.GetConnectionString(serverName, databaseName);
         }
 
         private void InitializeForm()
 		{
-			GetQueryList();
+			SetQueryList();
 			cboProcs.ValueMemberChanged += new EventHandler(cboProcs_SelectedIndexChanged);
 			gridParameters.DataError += new DataGridViewDataErrorEventHandler(gridParameters_DataError);
 			cboProcs.Focus();
 		}
 
-		private void GetQueryList()
+		private void SetQueryList()
 		{
-            var procList = new List<StoredProcInfo>();
-            foreach(DataRow row in queryList.Rows)
-            {
-                procList.Add(new StoredProcInfo(row["ProcedureSchemaName"].ToString(), row["ProcedureName"].ToString(), row["DisplayName"].ToString()));
-            }
-            cboProcs.DataSource = procList;
+            cboProcs.DataSource = QueryList.GetQueryList(serverName, databaseName, formatObjectName);
 		}
 
 		private void GetParameters()
 		{
             gridParameters.Rows.Clear();
             var selectedProc = (StoredProcInfo)cboProcs.SelectedValue;
-            Dictionary<string, SqlDbType> parameterList = SQLSchema.GetStoredProcedureParameters(serverName, databaseName,
-                selectedProc.SchemaName, selectedProc.ProcName);
+            var parameterList = selectedProc.StoredProcParameters;
             foreach(var item in parameterList)
             {
-                string parameterName = item.Key;
-                string parameterDisplayName = "";
-                SqlDbType parameterDataType = item.Value;
-                string parameterValue = "";
-                if (!parameterDisplayNames.TryGetValue(parameterName, out parameterDisplayName))
-                {
-                    parameterDisplayName = parameterName;
-                }
-                gridParameters.Rows.Add(parameterDisplayName, parameterName, parameterDataType, parameterValue);
+                string parameterName = item.ParameterName;
+                string parameterDisplayName = item.ParameterDisplayName;
+                SqlDbType parameterDataType = item.ParameterDataType;
+                string defaultParameterValue = "";
+
+                gridParameters.Rows.Add(parameterDisplayName, parameterName, parameterDataType, defaultParameterValue);
             }
             SetParameterDataTypes();
         }
 
-        private List<StoredProcParameter> GetParameterValues()
+        private List<StoredProcParameterValue> GetParameterValues()
 		{
-            var returnList = new List<StoredProcParameter>();
+            var returnList = new List<StoredProcParameterValue>();
 
             foreach (DataGridViewRow item in gridParameters.Rows)
 			{
@@ -84,7 +83,7 @@ namespace DataViewer
                     string value = item.Cells[3].Value.ToString();
                     string name = item.Cells[1].Value.ToString();
                     SqlDbType dataType = (SqlDbType)item.Cells[2].Value;
-                    var parameter = new StoredProcParameter(name, dataType, value);
+                    var parameter = new StoredProcParameterValue(name, dataType, value);
                     returnList.Add(parameter);
 				}
 			}
@@ -189,28 +188,8 @@ namespace DataViewer
                 if (!item.IsNewRow)
                 {
                     SqlDbType dataType = (SqlDbType)item.Cells[2].Value;
-                    item.Cells[3].ValueType = GetColumnDataType(dataType);
+                    item.Cells[3].ValueType = DatabaseCommon.DataType.GetColumnCSharpDataType(dataType);
                 }
-            }
-        }
-
-        private Type GetColumnDataType(
-            SqlDbType dataType
-        )
-        {
-            switch (dataType)
-            {
-                case SqlDbType.Date:
-                case SqlDbType.DateTime:
-                case SqlDbType.DateTime2:
-                    return typeof(DateTime);
-                case SqlDbType.BigInt:
-                case SqlDbType.Int:
-                case SqlDbType.SmallInt:
-                case SqlDbType.TinyInt:
-                    return typeof(Int32);
-                default:
-                    return typeof(String);
             }
         }
 
