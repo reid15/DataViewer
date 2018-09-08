@@ -107,12 +107,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="DataViewer_Config.xml">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\DatabaseCommon\DatabaseCommon.csproj">
       <Project>{8f4dc15f-0f01-4a24-945d-338eb97d5970}</Project>
       <Name>DatabaseCommon</Name>

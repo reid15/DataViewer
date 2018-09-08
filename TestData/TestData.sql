@@ -68,11 +68,34 @@ from sys.tables;
 
 go
 
+-- View
+
+create or alter view dbo.vwState
+as
+
+select StateCode as KeyValue, StateName as DisplayValue
+from dbo.[State];
+go
+
 -- Extended Properties
  
 EXEC sys.sp_addextendedproperty @name=N'DataViewer', @value=N'true' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'PROCEDURE',@level1name=N'GetCustomer';
 EXEC sys.sp_addextendedproperty @name=N'DataViewer', @value=N'true' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'PROCEDURE',@level1name=N'GetCustomerByState';
 EXEC sys.sp_addextendedproperty @name=N'DataViewer', @value=N'true' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'PROCEDURE',@level1name=N'GetSalesForCustomer';
+
+EXEC sys.sp_addextendedproperty @name=N'DataViewerName', @value=N'ZZ Get Customer', @level0type=N'SCHEMA',@level0name=N'dbo', 
+	@level1type=N'PROCEDURE',@level1name=N'GetCustomer';
+
+EXEC sys.sp_addextendedproperty @name=N'DataViewerName', @value=N'ZZZ Customer ID', 
+	@level0type=N'SCHEMA',@level0name=N'dbo', 
+	@level1type=N'PROCEDURE',@level1name=N'GetCustomer',
+	@level2type=N'PARAMETER',@level2name=N'@CustomerId';
+
+EXEC sys.sp_addextendedproperty @name=N'DataViewerLookup', @value=N'dbo.vwState', 
+	@level0type=N'SCHEMA',@level0name=N'dbo', 
+	@level1type=N'PROCEDURE',@level1name=N'GetCustomerByState',
+	@level2type=N'PARAMETER',@level2name=N'@state_code';
+
 GO
 
 -- Data

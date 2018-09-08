@@ -60,14 +60,29 @@ namespace DataViewer
             gridParameters.Rows.Clear();
             var selectedProc = (StoredProcInfo)cboProcs.SelectedValue;
             var parameterList = selectedProc.StoredProcParameters;
-            foreach(var item in parameterList)
+            foreach(StoredProcParameter item in parameterList)
             {
                 string parameterName = item.ParameterName;
                 string parameterDisplayName = item.ParameterDisplayName;
                 SqlDbType parameterDataType = item.ParameterDataType;
                 string defaultParameterValue = "";
 
-                gridParameters.Rows.Add(parameterDisplayName, parameterName, parameterDataType, defaultParameterValue);
+                // Lookup values
+                //if(item.LookupValues.Count > 0)
+                //{
+                //    var combo = new DataGridViewComboBoxCell();
+                //    combo.DisplayMember = "Key";
+                //    combo.ValueMember = "Value";
+                //    //combo.ValueType = typeof(string);
+                //    var source = new BindingSource(item.LookupValues, null);
+                //    combo.DataSource = source;
+                //    var a = source[0];
+                //    combo.Value = null;
+                //    gridParameters.Rows.Add(parameterDisplayName, parameterName, parameterDataType, defaultParameterValue, combo);
+                //} else
+                //{
+                    gridParameters.Rows.Add(parameterDisplayName, parameterName, parameterDataType, defaultParameterValue);
+                //}
             }
             SetParameterDataTypes();
         }
@@ -145,9 +160,16 @@ namespace DataViewer
 
 		private void cboProcs_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			ClearForm();
-			GetParameters();
-		}
+            try
+            {
+                ClearForm();
+			    GetParameters();
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler(ex);
+            }
+        }
 
 		private void GoButtonClick()
 		{

@@ -38,18 +38,21 @@ namespace DataViewer
         public SqlDbType ParameterDataType { get; set; }
         public string ParameterValue { get; set; }
         public string ParameterDisplayName { get; set; }
+        public Dictionary<string, string> LookupValues { get; set; }
 
         public StoredProcParameter(
             string parameterName,
             SqlDbType parameterDataType,
             string parameterValue,
-            string parameterDisplayName
+            string parameterDisplayName,
+            Dictionary<string, string> lookupValues
         )
         {
             ParameterName = parameterName;
             ParameterDataType = parameterDataType;
             ParameterValue = parameterValue;
             ParameterDisplayName = parameterDisplayName;
+            LookupValues = lookupValues;
         }
     }
 
