@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataViewer
 {
@@ -53,24 +49,6 @@ namespace DataViewer
             ParameterValue = parameterValue;
             ParameterDisplayName = parameterDisplayName;
             LookupValues = lookupValues;
-        }
-    }
-
-    public class StoredProcParameterValue
-    {
-        public string ParameterName { get; set; }
-        public SqlDbType ParameterDataType { get; set; }
-        public string ParameterValue { get; set; }
-
-        public StoredProcParameterValue(
-            string parameterName,
-            SqlDbType parameterDataType,
-            string parameterValue
-        )
-        {
-            ParameterName = parameterName;
-            ParameterDataType = parameterDataType;
-            ParameterValue = parameterValue;
         }
     }
 

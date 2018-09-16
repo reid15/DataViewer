@@ -3,12 +3,21 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Windows.Forms;
+using static DatabaseCommon.DataObject;
 
 namespace DataViewer
 {
     public partial class DataViewer : Form
 	{
-		string connectionString;
+        enum ParameterGridColumnIndex
+        {
+            DisplayParameterName = 0,
+            ParameterName = 1,
+            DataType = 2,
+            ParameterValue = 3
+        }
+
+        string connectionString;
         string serverName;
         string databaseName;
         bool formatObjectName = false;
@@ -47,7 +56,7 @@ namespace DataViewer
 			SetQueryList();
 			cboProcs.ValueMemberChanged += new EventHandler(cboProcs_SelectedIndexChanged);
 			gridParameters.DataError += new DataGridViewDataErrorEventHandler(gridParameters_DataError);
-			cboProcs.Focus();
+            cboProcs.Focus();
 		}
 
 		private void SetQueryList()
@@ -57,7 +66,8 @@ namespace DataViewer
 
 		private void GetParameters()
 		{
-            gridParameters.Rows.Clear();
+            ClearForm();
+            string defaultParameterValue = "";
             var selectedProc = (StoredProcInfo)cboProcs.SelectedValue;
             var parameterList = selectedProc.StoredProcParameters;
             foreach(StoredProcParameter item in parameterList)
@@ -65,24 +75,20 @@ namespace DataViewer
                 string parameterName = item.ParameterName;
                 string parameterDisplayName = item.ParameterDisplayName;
                 SqlDbType parameterDataType = item.ParameterDataType;
-                string defaultParameterValue = "";
+                var rowIndex = gridParameters.Rows.Add(parameterDisplayName, parameterName, parameterDataType, defaultParameterValue);
 
-                // Lookup values
-                //if(item.LookupValues.Count > 0)
-                //{
-                //    var combo = new DataGridViewComboBoxCell();
-                //    combo.DisplayMember = "Key";
-                //    combo.ValueMember = "Value";
-                //    //combo.ValueType = typeof(string);
-                //    var source = new BindingSource(item.LookupValues, null);
-                //    combo.DataSource = source;
-                //    var a = source[0];
-                //    combo.Value = null;
-                //    gridParameters.Rows.Add(parameterDisplayName, parameterName, parameterDataType, defaultParameterValue, combo);
-                //} else
-                //{
-                    gridParameters.Rows.Add(parameterDisplayName, parameterName, parameterDataType, defaultParameterValue);
-                //}
+                // Add Combo Box for Lookup values, if specified
+                if (item.LookupValues.Count > 0)
+                {
+                    var combo = new DataGridViewComboBoxCell();
+                    var source = new BindingSource(item.LookupValues, null);
+                    combo.DataSource = source;
+                    combo.ValueType = typeof(string);
+                    combo.ValueMember = "Key";
+                    combo.DisplayMember = "Value";
+                    gridParameters.Rows[rowIndex].Cells[(int)ParameterGridColumnIndex.ParameterValue] = combo;
+                }
+
             }
             SetParameterDataTypes();
         }
@@ -95,9 +101,9 @@ namespace DataViewer
 			{
 				if (!item.IsNewRow)
 				{
-                    string value = item.Cells[3].Value.ToString();
-                    string name = item.Cells[1].Value.ToString();
-                    SqlDbType dataType = (SqlDbType)item.Cells[2].Value;
+                    string value = item.Cells[(int)ParameterGridColumnIndex.ParameterValue].Value.ToString();
+                    string name = item.Cells[(int)ParameterGridColumnIndex.ParameterName].Value.ToString();
+                    SqlDbType dataType = (SqlDbType)item.Cells[(int)ParameterGridColumnIndex.DataType].Value;
                     var parameter = new StoredProcParameterValue(name, dataType, value);
                     returnList.Add(parameter);
 				}
@@ -176,7 +182,7 @@ namespace DataViewer
             var selectedProc = (StoredProcInfo)cboProcs.SelectedValue;
             var storedProcName = selectedProc.SchemaName + "." + selectedProc.ProcName;
             var parameterValues = GetParameterValues();
-			DataSet queryValue = DataAccess.FillDataSet(storedProcName, parameterValues, connectionString);
+			DataSet queryValue = DatabaseCommon.DataAccess.FillDataSet(storedProcName, parameterValues, connectionString);
 
 			BindingSource bindingSource = new BindingSource();
 			bindingSource.DataSource = queryValue.Tables[0];
@@ -188,10 +194,10 @@ namespace DataViewer
 			DataGridViewDataErrorEventArgs e
 		)
 		{
-			string errorMessage = "Parameter Data Validation Error" + Environment.NewLine +
-				e.Exception.Message;
-			MessageBox.Show(errorMessage);
-		}
+            string errorMessage = "Parameter Data Validation Error" + Environment.NewLine +
+                e.Exception.Message;
+            MessageBox.Show(errorMessage);
+        }
         #endregion
 
         private void ErrorHandler(
@@ -209,8 +215,8 @@ namespace DataViewer
             {
                 if (!item.IsNewRow)
                 {
-                    SqlDbType dataType = (SqlDbType)item.Cells[2].Value;
-                    item.Cells[3].ValueType = DatabaseCommon.DataType.GetColumnCSharpDataType(dataType);
+                    SqlDbType dataType = (SqlDbType)item.Cells[(int)ParameterGridColumnIndex.DataType].Value;
+                    item.Cells[(int)ParameterGridColumnIndex.ParameterValue].ValueType = DatabaseCommon.DataType.GetColumnCSharpDataType(dataType);
                 }
             }
         }

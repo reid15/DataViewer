@@ -65,7 +65,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataAccess.cs" />
     <Compile Include="DataObjects.cs" />
     <Compile Include="DataViewer.cs">
       <SubType>Form</SubType>

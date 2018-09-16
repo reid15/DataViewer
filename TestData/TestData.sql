@@ -1,11 +1,21 @@
 
 -- Test data for Data Viewer
 
--- Tables
+-- Cleanup
+
+drop procedure if exists dbo.GetCustomer;
+drop procedure if exists dbo.get_customer_by_state;
+drop procedure if exists dbo.GetSalesForCustomer;
+drop procedure if exists dbo.NotForDataViewer;
+drop procedure if exists dbo.GetSalesByState;
+
+drop view if exists dbo.vwState;
 
 drop table if exists dbo.Sales;
 drop table if exists dbo.Customer;
 drop table if exists dbo.[State];
+
+-- Tables
 
 create table dbo.[State](
 StateCode char(2) not null primary key,
@@ -40,7 +50,7 @@ from dbo.Customer as c
 where c.CustomerId = @CustomerId;
 
 go
-create or alter procedure dbo.GetCustomerByState
+create or alter procedure dbo.get_customer_by_state
 	@state_code char(2)
 as
 
@@ -58,6 +68,22 @@ from dbo.Sales as s
 join dbo.Customer as c
 	on c.CustomerId = s.CustomerId
 where c.CustomerId = @CustomerId;
+
+go
+create or alter procedure dbo.GetSalesByState
+	@state_code char(2),
+	@MinSalesAmount decimal(6,2)
+as
+
+select c.CustomerId, c.CustomerName, s.SalesAmount, s.SalesDescription, s.SalesDate,
+	st.StateName
+from dbo.Sales as s
+join dbo.Customer as c
+	on c.CustomerId = s.CustomerId
+join dbo.[State] as st
+	on st.StateCode = c.CustomerState
+where c.CustomerState = @state_code
+	and s.SalesAmount >= @MinSalesAmount;
 
 go
 create or alter procedure dbo.NotForDataViewer
@@ -79,21 +105,31 @@ go
 
 -- Extended Properties
  
-EXEC sys.sp_addextendedproperty @name=N'DataViewer', @value=N'true' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'PROCEDURE',@level1name=N'GetCustomer';
-EXEC sys.sp_addextendedproperty @name=N'DataViewer', @value=N'true' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'PROCEDURE',@level1name=N'GetCustomerByState';
-EXEC sys.sp_addextendedproperty @name=N'DataViewer', @value=N'true' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'PROCEDURE',@level1name=N'GetSalesForCustomer';
+EXEC sys.sp_addextendedproperty @name=N'DataViewer', @value=N'true' , @level0type=N'SCHEMA',@level0name=N'dbo', 
+	@level1type=N'PROCEDURE',@level1name=N'GetCustomer';
+EXEC sys.sp_addextendedproperty @name=N'DataViewer', @value=N'true' , @level0type=N'SCHEMA',@level0name=N'dbo', 
+	@level1type=N'PROCEDURE',@level1name=N'get_customer_by_state';
+EXEC sys.sp_addextendedproperty @name=N'DataViewer', @value=N'true' , @level0type=N'SCHEMA',@level0name=N'dbo', 
+	@level1type=N'PROCEDURE',@level1name=N'GetSalesForCustomer';
+EXEC sys.sp_addextendedproperty @name=N'DataViewer', @value=N'true' , @level0type=N'SCHEMA',@level0name=N'dbo', 
+	@level1type=N'PROCEDURE',@level1name=N'GetSalesByState';
 
-EXEC sys.sp_addextendedproperty @name=N'DataViewerName', @value=N'ZZ Get Customer', @level0type=N'SCHEMA',@level0name=N'dbo', 
+EXEC sys.sp_addextendedproperty @name=N'DataViewerName', @value=N'Sales: Get Customer', @level0type=N'SCHEMA',@level0name=N'dbo', 
 	@level1type=N'PROCEDURE',@level1name=N'GetCustomer';
 
-EXEC sys.sp_addextendedproperty @name=N'DataViewerName', @value=N'ZZZ Customer ID', 
+EXEC sys.sp_addextendedproperty @name=N'DataViewerName', @value=N'Sales: Customer ID', 
 	@level0type=N'SCHEMA',@level0name=N'dbo', 
 	@level1type=N'PROCEDURE',@level1name=N'GetCustomer',
 	@level2type=N'PARAMETER',@level2name=N'@CustomerId';
 
 EXEC sys.sp_addextendedproperty @name=N'DataViewerLookup', @value=N'dbo.vwState', 
 	@level0type=N'SCHEMA',@level0name=N'dbo', 
-	@level1type=N'PROCEDURE',@level1name=N'GetCustomerByState',
+	@level1type=N'PROCEDURE',@level1name=N'get_customer_by_state',
+	@level2type=N'PARAMETER',@level2name=N'@state_code';
+
+EXEC sys.sp_addextendedproperty @name=N'DataViewerLookup', @value=N'dbo.vwState', 
+	@level0type=N'SCHEMA',@level0name=N'dbo', 
+	@level1type=N'PROCEDURE',@level1name=N'GetSalesByState',
 	@level2type=N'PARAMETER',@level2name=N'@state_code';
 
 GO

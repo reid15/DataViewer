@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace DataViewer
@@ -19,7 +20,7 @@ namespace DataViewer
             List<StoredProcedure> procList = DatabaseCommon.DatabaseSchema.GetStoredProcedures(serverName, databaseName);
             foreach(StoredProcedure proc in procList)
             {
-                if (GetExtendedPropertyValue(proc.ExtendedProperties, "DataViewer") == "true")
+                if (GetExtendedPropertyValue(proc.ExtendedProperties, "DataViewer").ToLower() == "true")
                 {
                     string dataViewerName = GetExtendedPropertyValue(proc.ExtendedProperties, "DataViewerName");
                     string objectName = GetObjectName(proc.Name, formatObjectName, dataViewerName);
@@ -39,7 +40,7 @@ namespace DataViewer
             string returnValue = "";
             if (extendedProperties.Contains(propertyName))
             {
-                returnValue = extendedProperties[propertyName].Value.ToString().ToLower();
+                returnValue = extendedProperties[propertyName].Value.ToString();
             }
             return returnValue;
         }
@@ -62,6 +63,9 @@ namespace DataViewer
             returnName = returnName.Replace("@", " ");
             // Add a space in front of each capital letter
             returnName = Regex.Replace(returnName, "[A-Z]", " $0").Trim();
+            // Proper Case
+            TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
+            returnName = textInfo.ToTitleCase(returnName);
 
             return returnName;
         }

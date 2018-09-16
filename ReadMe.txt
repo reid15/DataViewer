@@ -5,7 +5,7 @@ DataViewer is a program to allow an end user to execute a SQL Server stored proc
 
 Requirements:
 The program requires the .Net Framework 4.0 or later. 
-Windows authentication is used. The user must have permission to view the database objects and data that will be compared.
+Windows authentication is used. The user must have permission to execute the stored procedures used by the program.
 No SQL Server edition specific features are used. All functions were tested using SQL Server 2017.
 The source code references the project in the DatabaseCommon repository.
 
@@ -38,3 +38,5 @@ EXEC sys.sp_addextendedproperty @name=N'DataViewerName', @value=N'Customer ID Nu
 	@level1type=N'PROCEDURE',@level1name=N'GetCustomer',
 	@level2type=N'PARAMETER',@level2name=N'@CustomerId';
 	
+Adding a DataViewerLookup extended property to a stored procedue parameter will have thr program used a view as a data source for the user to select a value from a combo box. The value of the property should be a schema qualified view name. The view should have a KeyValue attribute that will be used as the combo box value, and a DisplayName attribute that will be the display value for the combo.
+The TestData.sql script has examples of setting up the extended properties.	
