@@ -38,5 +38,5 @@ EXEC sys.sp_addextendedproperty @name=N'DataViewerName', @value=N'Customer ID Nu
 	@level1type=N'PROCEDURE',@level1name=N'GetCustomer',
 	@level2type=N'PARAMETER',@level2name=N'@CustomerId';
 	
-Adding a DataViewerLookup extended property to a stored procedue parameter will have thr program used a view as a data source for the user to select a value from a combo box. The value of the property should be a schema qualified view name. The view should have a KeyValue attribute that will be used as the combo box value, and a DisplayName attribute that will be the display value for the combo.
+Adding a DataViewerLookup extended property to a stored procedure parameter will have thr program used a view as a data source for the user to select a value from a combo box. The value of the property should be a schema qualified view name. The view should have a KeyValue attribute that will be used as the combo box value, and a DisplayName attribute that will be the display value for the combo.
 The TestData.sql script has examples of setting up the extended properties.	
