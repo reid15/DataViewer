@@ -3,45 +3,45 @@
 
 -- Cleanup
 
-drop procedure if exists dbo.GetCustomer;
-drop procedure if exists dbo.get_customer_by_state;
-drop procedure if exists dbo.GetSalesForCustomer;
-drop procedure if exists dbo.NotForDataViewer;
-drop procedure if exists dbo.GetSalesByState;
+DROP PROCEDURE IF EXISTS dbo.GetCustomer;
+DROP PROCEDURE IF EXISTS dbo.get_customer_by_state;
+DROP PROCEDURE IF EXISTS dbo.GetSalesForCustomer;
+DROP PROCEDURE IF EXISTS dbo.NotForDataViewer;
+DROP PROCEDURE IF EXISTS dbo.GetSalesByState;
 
-drop view if exists dbo.vwState;
+DROP VIEW IF EXISTS dbo.vwState;
 
-drop table if exists dbo.Sales;
-drop table if exists dbo.Customer;
-drop table if exists dbo.[State];
+DROP TABLE IF EXISTS dbo.Sales;
+DROP TABLE IF EXISTS dbo.Customer;
+DROP TABLE IF EXISTS dbo.[State];
 
 -- Tables
 
-create table dbo.[State](
-StateCode char(2) not null primary key,
-StateName varchar(30) not null
+CREATE TABLE dbo.[State](
+	StateCode char(2) not null primary key,
+	StateName varchar(30) not null
 );
 
-create table dbo.Customer(
-CustomerId smallint not null primary key,
-CustomerName varchar(50) not null,
-CustomerState char(2) not null references dbo.[State](StateCode)
+CREATE TABLE dbo.Customer(
+	CustomerId smallint not null primary key,
+	CustomerName varchar(50) not null,
+	CustomerState char(2) not null references dbo.[State](StateCode)
 );
 
-create table dbo.Sales(
-SalesId int not null identity(1,1) primary key,
-CustomerId smallint not null references dbo.Customer(CustomerId),
-SalesAmount decimal(6,2) not null,
-SalesDescription varchar(50) not null,
-SalesDate date not null
+CREATE TABLE dbo.Sales(
+	SalesId int not null identity(1,1) primary key,
+	CustomerId smallint not null references dbo.Customer(CustomerId),
+	SalesAmount decimal(6,2) not null,
+	SalesDescription varchar(50) not null,
+	SalesDate date not null
 );
 
-go
+GO
 
 -- Stored Procedures
 
-go
-create or alter procedure dbo.GetCustomer
+GO
+CREATE OR ALTER PROCEDURE dbo.GetCustomer
 	@CustomerId smallint
 as
 
@@ -49,8 +49,8 @@ select c.CustomerId, c.CustomerName
 from dbo.Customer as c
 where c.CustomerId = @CustomerId;
 
-go
-create or alter procedure dbo.get_customer_by_state
+GO
+CREATE OR ALTER PROCEDURE dbo.get_customer_by_state
 	@state_code char(2)
 as
 
@@ -58,8 +58,8 @@ select c.CustomerId, c.CustomerName, c.CustomerState
 from dbo.Customer as c
 where c.CustomerState = @state_code;
 
-go
-create or alter procedure dbo.GetSalesForCustomer
+GO
+CREATE OR ALTER PROCEDURE dbo.GetSalesForCustomer
 	@CustomerId smallint
 as
 
@@ -69,8 +69,8 @@ join dbo.Customer as c
 	on c.CustomerId = s.CustomerId
 where c.CustomerId = @CustomerId;
 
-go
-create or alter procedure dbo.GetSalesByState
+GO
+CREATE OR ALTER PROCEDURE dbo.GetSalesByState
 	@state_code char(2),
 	@MinSalesAmount decimal(6,2)
 as
@@ -85,14 +85,14 @@ join dbo.[State] as st
 where c.CustomerState = @state_code
 	and s.SalesAmount >= @MinSalesAmount;
 
-go
-create or alter procedure dbo.NotForDataViewer
+GO
+CREATE OR ALTER PROCEDURE dbo.NotForDataViewer
 as
 
 select [Name]
 from sys.tables;
 
-go
+GO
 
 -- View
 
@@ -101,7 +101,7 @@ as
 
 select StateCode as KeyValue, StateName as DisplayValue
 from dbo.[State];
-go
+GO
 
 -- Extended Properties
  
@@ -136,29 +136,29 @@ GO
 
 -- Data
 
-insert into dbo.[State](StateCode, StateName) values ('AL', 'Alabama');
-insert into dbo.[State](StateCode, StateName) values ('AK', 'Alaska');
-insert into dbo.[State](StateCode, StateName) values ('AR', 'Arkansas');
+INSERT INTO dbo.[State](StateCode, StateName) VALUES ('AL', 'Alabama');
+INSERT INTO dbo.[State](StateCode, StateName) VALUES ('AK', 'Alaska');
+INSERT INTO dbo.[State](StateCode, StateName) VALUES ('AR', 'Arkansas');
 
-insert into dbo.Customer(CustomerId, CustomerName, CustomerState)
-values (1, 'Acme Inc.', 'AL');
+INSERT INTO dbo.Customer(CustomerId, CustomerName, CustomerState)
+VALUES (1, 'Acme Inc.', 'AL');
 
-insert into dbo.Customer(CustomerId, CustomerName, CustomerState)
-values (2, 'Doug Smith', 'AK');
+INSERT INTO dbo.Customer(CustomerId, CustomerName, CustomerState)
+VALUES (2, 'Doug Smith', 'AK');
 
-insert into dbo.Customer(CustomerId, CustomerName, CustomerState)
-values (3, 'Jane Doe', 'AR');
+INSERT INTO dbo.Customer(CustomerId, CustomerName, CustomerState)
+VALUES (3, 'Jane Doe', 'AR');
 
-insert into dbo.Sales(CustomerId, SalesAmount, SalesDescription, SalesDate) 
-values (1, 350.00, 'Tires', dateadd(day, -3, getdate()));
+INSERT INTO dbo.Sales(CustomerId, SalesAmount, SalesDescription, SalesDate) 
+VALUES (1, 350.00, 'Tires', dateadd(day, -3, getdate()));
 
-insert into dbo.Sales(CustomerId, SalesAmount, SalesDescription, SalesDate) 
-values (2, 50.00, 'Muffler', dateadd(day, -2, getdate()));
+INSERT INTO dbo.Sales(CustomerId, SalesAmount, SalesDescription, SalesDate) 
+VALUES (2, 50.00, 'Muffler', dateadd(day, -2, getdate()));
 
-insert into dbo.Sales(CustomerId, SalesAmount, SalesDescription, SalesDate) 
-values (1, 500.00, 'Bumper', dateadd(day, -1, getdate()));
+INSERT INTO dbo.Sales(CustomerId, SalesAmount, SalesDescription, SalesDate) 
+VALUES (1, 500.00, 'Bumper', dateadd(day, -1, getdate()));
  
-insert into dbo.Sales(CustomerId, SalesAmount, SalesDescription, SalesDate) 
-values (2, 35.00, 'Oil Change', getdate());
+INSERT INTO dbo.Sales(CustomerId, SalesAmount, SalesDescription, SalesDate) 
+VALUES (2, 35.00, 'Oil Change', getdate());
 
-go
+GO
